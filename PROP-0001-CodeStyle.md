@@ -11,6 +11,16 @@
  * Use `const` religiously
  * Use the `deprecated` attribute
    * (Has not been created yet)
+ * Use compile-time checking whenever possible
+   * static_assert 
+ * Use templates, but use them responsibly
+ * Reduce code duplication
+   * Templates and template patterns
+     * Variadic templates
+     * Tag dispatch
+   * Once and only once
+   * Copy-and-swap idiom
+ 
 
 ## File management
  * `.cpp` and `.hpp` for C++ files
@@ -65,10 +75,10 @@
   * Can use STL containers for lookup tables (particularly std::map) if performance is not crucial
   * Avoid creating `Init()` for populating lookup tables
     * Can use brace initializers for instantiating complicated global data (ie, std::map)
+      * Yes, this works with dynamic module loading
+        * Really, it does
     * Do not construct with other global data
     * Use scripts to generate lookup table source files
-    * Yes, this works with dynamic module loading
-      * Really, it does
 
 
 ## Namespaces
