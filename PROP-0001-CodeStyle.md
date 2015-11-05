@@ -37,7 +37,7 @@
    * For GCC: `-Wall -Wextra -pedantic -Wfloat-equal -Wshadow -Wswitch-default -Wconversion`
    * For Intel: `-w3`
      * Some useless remarks can be disabled project-wide
- * Selectively disable warnings for sections of code (see `pragmas.h`)
+ * Selectively disable warnings for sections of code (see `pragma.h`)
 
 
 ## Pointers
