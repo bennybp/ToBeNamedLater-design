@@ -11,3 +11,4 @@
 ## Features
  * Recursive fragments
  * Iteration over all atoms within a fragment, including the top-level "Molecule"
+ * Iteration over all sub-fragments within a fragment

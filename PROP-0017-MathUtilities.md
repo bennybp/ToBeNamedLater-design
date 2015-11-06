@@ -16,5 +16,6 @@
    * Will check for underflow, overflow, and loss of precision
  * Round cast - Loss of precision ok
    * Can cast integer to floating point and vice versa
+ * Physical and mathematical constants
  * Use of templates for efficient code
  * When possible, checks are done at compile time
