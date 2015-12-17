@@ -9,15 +9,26 @@
 ## Purpose
 Particularly in the electronic structure development community, there is no such things as a typical electronic structure computation.  The purpose of the graph is to store the module call hierarchy of the computation as well as the input and output of each computation.  With proper integration, checkpointing the graph will be sufficient to restart the computation.  The graph evolves in a dynamic manner so that arbitrarily complex call trees can be handled in a consistent manner.  
 
-The graph starts with an initial node, the initial graph state (to be enumerated shortly) and the initial module to be called.  Execution then proceeds by running this module, which we now term the parent module.  During the parent module's execution, more than likely, additional modules will be called, each of which is termed a child module.  These child modules are added to the graph with an edge running from the parent to the child.  Each child is given copies of its parent's graph state, but the parent module may modify this as it sees fit, before executing the child module.  Upon running a child module, execution enters the child module, which is now considered the parent module, and the now parent module uses its current graph state to run its computations.  The now parent module may call other child modules and the cycle continues.  Upon completing, program execution returns to the current module's parent.
+The graph starts with an initial node, the initial graph state (to be enumerated shortly) and the initial module to be called.  Execution then proceeds by running this module, which we now term the parent module.  During the parent module's execution, more than likely, additional modules will be called, each of which is termed a child module.  These child modules are added to the graph with an edge running from the parent to the child.  Each child is given copies of its parent's graph state, but the parent module may modify this as it sees fit, before executing the child module.  Upon running a child module, execution enters the child module, which is now considered the parent module, and the now parent module uses its current graph state to run its computations.  The now parent module may call other child modules and the cycle continues.  Upon completing, program execution returns to the current module's parent, when all modules have completed program execution terminates.
 
-The state of the graph contains
+The state of the graph contains:
 
 1. A shared pointer to a constant system (molecule plus external fields)
 2. A shared pointer to a constant basis set
 3. A shared pointer to an options object
 4. A shared pointer to a constant reference (currently termed the wavefunction, which contains information related to the state of the system)
-5. The orginal node also contains the cache, but this is not directly accessible by any node (ensures that it is checkpointed)
+
+Additionally Boost allows us to associate one instance of a class with the overall graph.  Trivially, this is somewhat akin to say naming the graph, but the fact that it is templated and not limited to a string allows us to exploit this and to instead store:
+
+1. The original molecule specification
+2. The original basis set
+3. The original options
+4. The original wavefunction (usually a null object)
+5. The cache that will be used by the module locator
+
+in the graph.
+
+##Sample Usage
 
 To illustrate the user of the graph consider a geometry optimization at the Hartree-Fock level of theory:
 
