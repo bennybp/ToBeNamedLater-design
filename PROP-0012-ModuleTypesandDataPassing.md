@@ -62,6 +62,7 @@
   - On account of latter, depends on density and should be inside the SCF iterations!!!!!
 - JKBuilder: Builds J and K matrices (uses 2eInts)
   - Should be able to build just J, just K, or both
+  - Multipole moments for J when electrons are "distant"
 - GBuilder: In charge of building the two-electron contribution to the Fock operator (uses JKBuilder)
   - In charge of scaling J and K
 - FockBuilder: In charge of building the Fock operator (uses CoreBuilder and GBuilder)
