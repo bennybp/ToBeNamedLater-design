@@ -26,10 +26,10 @@ public SharedPointer Molecule;
 public SharedPointer Basis;
 public Tensor MOCoeffs;
 public Tensor OrbitalEnergies;
-public Tensor CI/MRCoeffs;
+public Tensor CIMRCoeffs;
 }
 )
 
-The molecule and basis should be self explanatory, they are the molecule and basis set used to create your current wavefuntion.  The MOCoeffs are how to form the MOs from the AOs contained in the basis set.  The orbital energies are, well, the energies of the MOs.  The CI/MRCoeffs are how the many-electron wavefunction is expanded in terms of Slater determinants, i.e. the configuration interactio or multi-reference coefficients (likely we will extend this Tensor to also hold coupled cluster amplitudes as they serve a similar purpose).
+The molecule and basis should be self explanatory, they are the molecule and basis set used to create your current wavefuntion.  The MOCoeffs are how to form the MOs from the AOs contained in the basis set.  The orbital energies are, well, the energies of the MOs.  The CIMRCoeffs are how the many-electron wavefunction is expanded in terms of Slater determinants, i.e. the configuration interactio or multi-reference coefficients (likely we will extend this Tensor to also hold coupled cluster amplitudes as they serve a similar purpose).
 
 Food for thought.  Does it make sense to combine the Basis, MOCoeffs, and OrbitalEnergies into a class called Reference, which is the Slater determinant we are using as the reference?
