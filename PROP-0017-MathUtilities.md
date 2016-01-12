@@ -17,5 +17,15 @@
  * Round cast - Loss of precision ok
    * Can cast integer to floating point and vice versa
  * Physical and mathematical constants
+ * Unit conversions
  * Use of templates for efficient code
  * When possible, checks are done at compile time
+ 
+ * Permutation generators
+ * Combination generators
+ * Power set generators
+ * Finite difference
+ * Factorials
+ * Double factorials
+ * Binomial coefficients
+ * Graph library (?)
