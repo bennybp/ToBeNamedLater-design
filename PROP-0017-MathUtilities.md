@@ -9,7 +9,7 @@
 ## Purpose
  * Most vector, matrix, and tensor math should be in the tensor class / namespace, not this one.
 
-## Components
+## Features
  * Casting between types
  * Exact cast - no loss of precision
    * Cast between integer types or between floating point types only
@@ -20,7 +20,8 @@
  * Unit conversions
  * Use of templates for efficient code
  * When possible, checks are done at compile time
- 
+
+## Components
  * Permutation generators
  * Combination generators
  * Power set generators
