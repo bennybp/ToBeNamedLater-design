@@ -21,98 +21,62 @@ Here's my take on a hierarchy of systems
 class UMLOptions{}
 /**
 *@opt all
-*@note Base class for a Cartesian
-*point and its various weights
-*%28grids, nuclei, etc.%29
+*@note Class for an object that has set-like
+*properties in a mathematical sense.  This
+*class is templated on an element type T and
+*a storage class U.  I can't use angle brackets
+*with this UML so read TU as <T,U>.  Universe
+*and StorageClass are actually shared pointers.
 */
-class WeightedPoint{
-public array Weights;
-public array Carts;
+class MathSet_T_U{
+Vector_T Elements;
+MathSet_T_U Universe;
+U StorageClass;
 }
 /**
 *@opt all
-*@note A set of points satisfying some criteria
-*@has  "" - "" WeightedPoint
+*@note A base class for a point, such as an atom
 */
-class Locus{
-public tensor Moments%28%29;
-public size_t size%28%29;
-public Locus Union%28%29;
-public Locus Intersection%28%29;
-public Locus Difference%28%29;
-array Points;
+class Point{
+int index;
+reference_vector Carts;
+reference_map Weights;
 }
 /**
-*@opt all
-*@note An interface to WeightedPoint,
-*fitting of an atom
+*@Opt all
+*@note a base class for a Gaussian shell
 */
-class Atom extends WeightedPoint{
-public size_t Z%28%29;
-public double Charge%28%29;
-public array Carts%28%29;
-public double Mass%28%29;
-public size_t NElectrons%28%29;
-}/**
-*@opt all
-*@note Interface to atom for ghost atom
-*/
-class GhostAtom extends Atom{}
-/**
-*@opt all
-*@note Interface to atom for a point, multipole moment
-*/
-class Multipole extends Atom{}
-/**
-*@opt all
-*@note Interface for a heavily parameterized point
-*/
-class MMAtom extends Multipole{}
-/**
-*@opt all
-*@note Interface for a dummy atom
-*/
-class DummyAtom extends Atom{}
-/**
-*@opt all
-*@note Interface to Locus for a molecule
-*/
-class Molecule extends Locus{
-public size_t NAtoms%28%29;
-public double Charge%28%29;
-public double NAlpha%28%29;
-public double NBeta%28%29;
-public double CoM%28%29;
-public double CoC%28%29;
-}
-)
-Continued to avoid character limitations
-![Alt text](http://g.gravizo.com/g?
-class Molecule{
+class Shell{
+int index;
+vector Carts;
+vector Coefs;
+vector Exps;
+int NPrims;
+int AngularMomentum;
 }
 /**
-*@opt all
-*@note Interface to Molecule for a fragment
+*@Opt all
+*@note a class for storing all the Shell data
 */
-class Fragment extends Molecule{
-Molecule Parent;
-public Fragment Complement%28%29;
+class ShellStorage{
+vector Carts;
+vector Coefs;
+vector Exps;
 }
 /**
-*@opt all
-*@note Interface to a molecule in a unit cell
+*@Opt all
+*@note a class for storing all the point data
 */
-class UnitCell extends Molecule{
-Array Lengths;
-Array Angles;
+class PointStorage{
+vector Carts;
+map Weights;
 }
 /**
-*@opt all
-*@note Lattice of unit cells (can be finitely or
-*infinitely replicated)
+*@Opt all
+*@note Implements a molecule by setting
+*T=Point and U=PointStorage
 */
-class SuperCell extends UnitCell{
-Array LatticeDims;
+class Locus extends MathSet_T_U{
 }
 )
 
