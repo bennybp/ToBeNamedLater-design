@@ -43,40 +43,41 @@ reference_vector Carts;
 reference_map Weights;
 }
 /**
-*@Opt all
-*@note a base class for a Gaussian shell
+*@opt all
+*@note An interface to a point reflecting its atom status
+*weights include atomic number, mass, charge
 */
-class Shell{
-int index;
-vector Carts;
-vector Coefs;
-vector Exps;
+class Atom extends Point{}
+/**
+*@Opt all
+*@note An interface to a point reflecting its shell status
+*weights includes exponents and coefficients
+*/
+class Shell extends Point{
 int NPrims;
 int AngularMomentum;
 }
 /**
 *@Opt all
-*@note a class for storing all the Shell data
+*@note a class for storing all the data
 */
-class ShellStorage{
-vector Carts;
-vector Coefs;
-vector Exps;
-}
-/**
-*@Opt all
-*@note a class for storing all the point data
-*/
-class PointStorage{
+class Storage{
 vector Carts;
 map Weights;
 }
 /**
 *@Opt all
 *@note Implements a molecule by setting
-*T=Point and U=PointStorage
+*T=Atom and U=Storage
 */
 class Locus extends MathSet_T_U{
+}
+/**
+*@Opt all
+*@note Implements a Gaussian basis set by setting
+*T=Shell and U=Storage
+*/
+class BasisSet extends MathSet_T_U{
 }
 )
 
