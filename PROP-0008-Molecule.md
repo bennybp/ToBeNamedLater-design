@@ -35,7 +35,9 @@ U StorageClass;
 }
 /**
 *@opt all
-*@note A base class for a point, such as an atom
+*@note A base class for a point, such as an atom or a shell
+*carts are where the point is located, weights are properties
+*associated with the point.
 */
 class Point{
 int index;
@@ -59,7 +61,7 @@ int AngularMomentum;
 }
 /**
 *@Opt all
-*@note a class for storing all the data
+*@note a class for storing all the data contigiously
 */
 class Storage{
 vector Carts;
