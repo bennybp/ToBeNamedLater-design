@@ -25,7 +25,8 @@ class Shell{
 public Shell();
 public int L();
 public int NPrims();
-public void AddPrim();
+public int NGeneral();
+public void SetExp();
 public double Coef();
 public double Exp();
 public double Comp();
@@ -35,8 +36,10 @@ public double Comp();
 * `Shell(int l,double x,double y, double z)` makes a shell, with angular momentum l, located at {x,y,z}
 * `int L()const` returns the angular momentum, in a.u.
 * `int NPrims()const` returns the number of primitives
-* `void AddPrim(double& Coef,double& exp)` adds a new primitive with the given coefficient and exponent.  Must be by reference so that general contractions can literally point to the same set of exponents (is this necessary/sufficient?)
-* `double Coef(int i)const` returns the i-th primitive's expansion coefficient in a.u.
+* `int NGeneral()const` returns 1 for segmented basis functions and NPrims (?) for general basis sets
+* `void SetExp(double Exp,int i)` sets the i-th primitive's exponent to Exp
+* `void SetCoef(dobule Coef,int i,int j)` sets the i-th primitive of the j-th basis function to Coef
+* `double Coef(int i,int j)const` returns the expansion coefficient for the i-th primitive of the j-th basis function  in a.u.
 * `double Exp(int i)const` returns the i-th primitive's exponent in a.u.
 * `double Comp(int i)const` returns the i-th Cartesian component in a.u.
 
