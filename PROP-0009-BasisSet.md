@@ -28,7 +28,7 @@ public int NPrims();
 public void AddPrim();
 public double Coef();
 public double Exp();
-public double Comp()
+public double Comp();
 }
 )
 
