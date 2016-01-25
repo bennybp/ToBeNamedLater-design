@@ -33,12 +33,12 @@ public double Comp();
 )
 
 * `BasisFunction(int l,double x,double y, double z)` makes a basis function, with angular momentum l, located at {x,y,z}
-* `int L()` returns the angular momentum, in a.u.
-* `int NPrims()` returns the number of primitives
+* `int L()const` returns the angular momentum, in a.u.
+* `int NPrims()const` returns the number of primitives
 * `void AddPrim(double& Coef,double& exp)` adds a new primitive with the given coefficient and exponent.  Must be by reference so that general contractions can literally point to the same set of exponents (is this necessary/sufficient?)
-* `double Coef(int i)` returns the i-th primitive's expansion coefficient in a.u.
-* `double Exp(int i)` returns the i-th primitive's exponent in a.u.
-* `double Comp(int i)` returns the i-th Cartesian component in a.u.
+* `double Coef(int i)const` returns the i-th primitive's expansion coefficient in a.u.
+* `double Exp(int i)const` returns the i-th primitive's exponent in a.u.
+* `double Comp(int i)const` returns the i-th Cartesian component in a.u.
 
 The minimum public interface of the BasisSet class should be:
 
@@ -64,13 +64,13 @@ public Molecule Intersection();
 }
 )
 
-* `BasisFunction GetBasisFunction(int i)` returns the i-th basis function in the basis set as the BasisFunction class
-* `int MaxL()` returns the maximum angular momentum, in a.u.
-* `int NPrims()` returns the total number of primitives
-* `int NBasisFunctions()` returns the total number of basis functions
-* `BasisSet Combine(BasisSet Other)` returns the union of this BasisSet and other
-* `BasisSet SetDiff(BasisSet Other)` returns the set difference (elements in the first set that are not in the second set) of this and other
-* `BasisSet Intersection(BasisSet Other)` returns the basis functions common to this and other
+* `BasisFunction GetBasisFunction(int i)const` returns the i-th basis function in the basis set as the BasisFunction class
+* `int MaxL()const` returns the maximum angular momentum, in a.u.
+* `int NPrims()const` returns the total number of primitives
+* `int NBasisFunctions()const` returns the total number of basis functions
+* `BasisSet Combine(const BasisSet& Other)const` returns the union of this BasisSet and other
+* `BasisSet SetDiff(const BasisSet& Other)const` returns the set difference (elements in the first set that are not in the second set) of this and other
+* `BasisSet Intersection(const BasisSet& Other)const` returns the basis functions common to this and other
  
 One is free to provide additional functionality beyond this, but not required.
  
