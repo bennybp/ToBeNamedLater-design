@@ -57,7 +57,7 @@ public BasisFunction GetBasisFunction();
 public int MaxL();
 public int NPrims();
 public int NBasisFunctions();
-public double Comp();
+public void AddBasisFunction();
 public Molecule Combine();
 public Molecule SetDiff();
 public Molecule Intersection();
@@ -68,6 +68,7 @@ public Molecule Intersection();
 * `int MaxL()const` returns the maximum angular momentum, in a.u.
 * `int NPrims()const` returns the total number of primitives
 * `int NBasisFunctions()const` returns the total number of basis functions
+* `void AddBasisFunction(const BasisFunction& BF);` Adds a basis function to the basis set
 * `BasisSet Combine(const BasisSet& Other)const` returns the union of this BasisSet and other
 * `BasisSet SetDiff(const BasisSet& Other)const` returns the set difference (elements in the first set that are not in the second set) of this and other
 * `BasisSet Intersection(const BasisSet& Other)const` returns the basis functions common to this and other
