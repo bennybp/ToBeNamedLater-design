@@ -29,9 +29,8 @@ public Atom();
 public double Mass();
 public void SetMass();
 public double Charge();
-public void SetCharge();
+public void SetChargeAndMult();
 public int Mult();
-public void SetMult();
 public int Z();
 public double NElectrons();
 public void SetNElectrons();
@@ -44,9 +43,8 @@ Otherwise the functions are:
 * `double Mass()const` returns the mass, in a.u.
 * `void SetMass(double m)` sets the mass to m (m in a.u.)
 * `double Charge()const` returns the charge of the atom, in a.u. In general this should be Z less the number of electrons, and should be a double to support say MM charges
-* `void SetCharge(double q)` sets the charge to q (q in a.u.)
+* `void SetChargeAndMult(double q,int m)` sets the charge to q (q in a.u.) and multiplicity to m
 * `int Mult()const` returns the multiplicity of the atom
-* `void SetMult(int m)` sets the multiplicity to m
 * `int Z()const` returns the atomic number
 * `void SetNElectrons(double N)` sets the number of electrons to N
 * `double NElectrons()const` returns the number of electrons, must be a double to allow for fractional numbers of electrons
