@@ -33,7 +33,7 @@
  * Header include guards can be fixed to a standard form with `headerguard.py`
  * Wrap C header files with 
 
-
+```C++
     #ifdef __cplusplus
     extern "C" {
     #endif
@@ -41,7 +41,7 @@
     #ifdef __cplusplus
     }
     #endif
-
+```
 
 ## Includes
  * Include paths should begin with the base path of the project
