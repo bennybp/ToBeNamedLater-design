@@ -23,7 +23,7 @@ It is important that code try to determine if input will lead to undesirable res
 This is a debug check.  When the project is compiled in release mode these checks will not be made.  Code for this is included in the assert class and should not be replicated by the user.  The syntax is as follows:
 
 ```C++
-exception::assert<T>(condition, message, ...) ```
+exception::assert<T>(condition, message, ...) 
 ```
 
 `T` is the type of exception to throw if the assertion fails
