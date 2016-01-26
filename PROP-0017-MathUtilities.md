@@ -29,4 +29,5 @@
  * Factorials
  * Double factorials
  * Binomial coefficients
+ * Set library (set in the math sense, i.e. we can do unions,intersections, etc.)
  * Graph library (?)
