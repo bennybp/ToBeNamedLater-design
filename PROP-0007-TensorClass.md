@@ -11,7 +11,7 @@ Electronic structure theory is naturally expressed in the language of multidimen
 ```
 F["i,j"]=H["i,j"]+G["i,j"];
 ```
-regardless of where the data lives, how it is stored (dense/sparse/replicated/distributed/cyclically/etc.), and the dimensions of the tensors (i.e. this equation works for both RHF and UHF).
+regardless of where the data lives, how it is stored (dense/sparse/replicated/distributed/cyclically/etc.), and the dimensions of the tensors (i.e. this equation works for both RHF and UHF).  At the moment we are intending to use Ryan's tensor wrapper and this document focuses on that.
 
 ## Implementation Features
  * Arbitrary rank tensors from 0 to the maximum-unsigned-integer-your-computer-can-handle
