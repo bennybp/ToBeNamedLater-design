@@ -56,7 +56,7 @@ A few details of this setup:
     sometimes called a *staged install*.
     * This installs it to `${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}`, but the package
       thinks it is being installed to `${CMAKE_INSTALL_PREFIX}`.
-  * Each external project is responsible for finding its own dependencies (usually through CMake `find_package`)
+  * Each external project (including the core project) is responsible for finding its own dependencies (usually through CMake `find_package`)
   * For these calls to `find_package` to work, either
     * The package provides a CMake `<package>Config.cmake` file
     * The package provides a `Find<package>.cmake` file (and we add the path to the appropriate CMake variable)
