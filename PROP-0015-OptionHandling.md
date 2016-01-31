@@ -1,4 +1,4 @@
-# PROP 0013 - Option Handling
+# PROP 0015 - Option Handling
 
 |                |                                           |
 |:---------------|:------------------------------------------|
@@ -8,7 +8,7 @@
 
 ## Purpose
 
-## Components
+## Requirements
  * Allow the module developer to use custom validators
  * OptionMap class will handle conversions between types
    when appropriate (between integers, between floating point, etc).

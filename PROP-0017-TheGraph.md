@@ -1,4 +1,4 @@
-# PROP 0015 - The Graph (rename to avoid confusion with class that implements it?)
+# PROP 0017 - The Graph (rename to avoid confusion with class that implements it?)
 
 |                |                                           |
 |:---------------|:------------------------------------------|

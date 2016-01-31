@@ -1,4 +1,4 @@
-# PROP 0018 - Class Builder Tools
+# PROP 0020 - Class Builder Tools
 
 |                |                                              |
 |:---------------|:------------------------------------------   |
@@ -8,14 +8,22 @@
 
 ## Purpose
 
-I got the idea from Tiled Array to maybe have a series of base classes that things can inheret from as a
-means of code factorization.  For example Tiled Array defines a base class NoDefaults, which automatically
-deletes all compiler generated class members.  Such a class could be easily incorporated into an existing
-class hierarchy by multiple inheritance.  Such classes are called mix-ins.  I also want to have macros for common patterns (this idea is from boost).
+I got the idea from Tiled Array to maybe have a series of base classes
+that things can inheret from as a means of code factorization.
+For example Tiled Array defines a base class NoDefaults, which
+automatically deletes all compiler generated class members.  Such a
+class could be easily incorporated into an existing class hierarchy by
+multiple inheritance.  Such classes are called mix-ins.  I also want to
+have macros for common patterns (this idea is from boost).
 
 ##Contents
 
-My first contribution to this toolbox will be a macro for generating all the fill functions automatically.  It should be used in all container like classes.  C++11 introduces variadic templates and initializer lists, meaning for any container like class, the same fill options appear over and over again:
+My first contribution to this toolbox will be a macro for generating all
+the fill functions automatically.  It should be used in all container
+like classes.  C++11 introduces variadic templates and initializer lists,
+meaning for any container like class, the same fill options appear over
+and over again:
+
 ```C++
 ///Silly container like class which holds data of type T
 template<typename T>

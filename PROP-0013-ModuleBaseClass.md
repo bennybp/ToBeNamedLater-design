@@ -1,11 +1,10 @@
-# PROP 0010 - Module Loading and Management
+# PROP 0013 - Module Base Class
 
 |                |                                           |
 |:---------------|:------------------------------------------|
-| Description:   |                                           |
+| Description:   | Functionality of the base Module class    |
 | Status:        | In development                            |
  
 
 ## Purpose
-To be written by Ben who is the expert on this
- 
+
