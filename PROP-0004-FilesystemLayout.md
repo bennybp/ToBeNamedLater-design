@@ -17,7 +17,7 @@ It is important that developers know where to look for files and where to put ne
     - **exception** - where code related to our error handeling lives
     - **math** - general mathematical classes and functionality
     - **modulebase** - module interfaces. Modules are required to conform to these interfaces
-    - **modulelocator** - code for selecting, initializing, and loading modules
+    - **modulemanager** - code for selecting, initializing, and loading modules
     - **output** - code for standard printing as well as more complicated printing
     - **parallel** - parallelization infrastructure
     - **python** - wrapper and helpers for Python-C++ interoperability

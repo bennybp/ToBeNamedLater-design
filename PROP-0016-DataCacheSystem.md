@@ -17,8 +17,8 @@ later from another instance of the module.
 
 
 ## Structure
- * Stored in and owned by the ModuleLocator
- * When a module is loaded, it is given its cache object by the ModuleLocator
+ * Stored in and owned by the ModuleManager
+ * When a module is loaded, it is given its cache object by the ModuleManager
  * May be checkpointed, but this is optional for a given run
  * Should be thread safe
  * Data must be serializable!!!!!

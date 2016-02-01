@@ -22,7 +22,19 @@ Boost::serialization is one of the standard libraries, but we are exploring othe
 * deep storing pointers
  
 ## Checkpointing features
-The idea is that we serialize the graph and the cache.  The modulelocator will be rebuilt as it is trivial.  We then reexecute the graph starting with the first node.  Because each module stored their important, computationally expensive results like say the energy, in the cache, and because the input to each module has not changed when the module is called, the module looks in the cache, sees that it already knows the energy for this input and simply returns it.  For this to work it is absolutely essential that only the options that actually affect an outcome are used to "hash" an input.  That is changing the amount of memory or the number of threads doesn't (or at least it shouldn't) change the final SCF energy and thus shouldn't be used by the SCF module to cache a result.
+
+The idea is that we serialize the graph and the cache.  The modulemanager
+will be rebuilt as it is trivial and loaded modules may change from
+rnu to run.  We then reexecute the graph starting with the first node.
+Because each module stored their important, computationally expensive
+results like say the energy, in the cache, and because the input to each
+module has not changed when the module is called, the module looks in the
+cache, sees that it already knows the energy for this input and simply
+returns it.  For this to work it is absolutely essential that only the
+options that actually affect an outcome are used to "hash" an input.
+That is changing the amount of memory or the number of threads doesn't
+(or at least it shouldn't) change the final SCF energy and thus shouldn't
+be used by the SCF module to cache a result.
 
 Keeping track of what a module depends on is admittidly complicated so why not punt?  Each module defines a function:
 
