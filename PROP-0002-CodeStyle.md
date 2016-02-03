@@ -96,6 +96,8 @@ lead to more readable and maintainable code.
   * Prefer `std::array` over a fixed-length array (ie, `std::array<3, double>` vs `double[3]`)
     * Very low overhead
     * Provides better copy and move semantics, as well as iterators
+  * Consider replacing `std::map` with `std::unordered_map` and `std::multimap` with `std::unordered_multimap`
+    if ordering is not important (is basically a drop-in replacement and can result is some decent speedup).
 
 
 
@@ -103,8 +105,6 @@ lead to more readable and maintainable code.
 
   * Globals should only be used for constant data and lookup tables
   * Can use STL containers for lookup tables (particularly `std::map`) if performance is not crucial
-  * Consider replacing `std::map` with `std::unordered_map` and `std::multimap` with `std::unordered_multimap`
-    if ordering is not important (is basically a drop-in replacement and can result is some decent speedup).
   * Avoid creating `Init()` for populating lookup tables
     * Can use brace initializers for instantiating complicated global data (ie, `std::map` of structures)
       * Yes, this works with dynamic module loading
