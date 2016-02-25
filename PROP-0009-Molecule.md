@@ -4,7 +4,17 @@
 |:---------------|:------------------------------------------|
 | Description:   | Our chemical system of interest           |
 | Status:        | In development                            |
- 
+
+## Content
+ 1. [Purpose](#purpose)
+ 2. [APIs](#apis)
+    - [Atom](#atom)
+    - [Atom Discussion](#atom-discussion)
+    - [Molecule](#molecule)
+    - [Molecule Discussion](#molecule-discussion)
+ 3. [Features of Our Implementation](#features-of-our-implementation)
+    - [Our Atom Class](#our-atom-class)
+    - [Our Molecule Class](#our-molecule-class)
 
 ## Purpose
 
@@ -88,7 +98,7 @@ Otherwise the functions are:
 * **`void SetNElectrons(double N)`** - Sets the number of electrons to `N`. Double to allow for fractional occupation
 * **`void SetZ(int i)`** - Sets the atomic number
 
-##### Points of discussion
+##### Atom Discussion
 
 * Allow changing of `Z` or of the coordinates
   * Ryan - I'm going back on my original statement and think they should be modifiable.  We should rely on const-ness to enforce can/can't modify something (above statements have been modified)
@@ -163,7 +173,7 @@ not change it.  Similarly if something is returning
 **Note** - As written, there should be no assumption (at the interface level) as to the layout of
 the data (contiguousness, etc) to the developer using the library. I.e., there should be no `&GetAtom[0]` type stuff.
 
-##### Points of discussion
+##### Molecule Discussion
 
 * Should we allow changing of atom data via `GetAtom` and then changing it? Or should `GetAtom` return a copy
   * Ben - Changing my view slightly, and maybe it should be possible. It is generally what is expected
@@ -192,7 +202,7 @@ would probably have to be part of the class (to take advantage of contiguous dat
  How is symmetry stored
 -->
 
-## Features (of our implementation)
+## Features of our implementation
 We need to flush out some more use cases and also address element access.  This example relies on the "give me Atom 1" mindset.
 
 Ultimately the goal of our interface is to have a syntax like:
@@ -219,13 +229,12 @@ Molecule CO2_2=CO+O2;
 std::cout<<CO[0]<<std::endl;
 
 ```
-### Design considerations
-#### Atom Class
+### Our Atom Class
    * Contains its basis set
    * Contains a nucleus subclass tracking isotope data as well as effective core potentials, finite nucleus, etc.
    * Knows empirical physical data for that element, such as covalent/VDW raddii etc. (implemented via pointer to some const class)
     
-#### Molecule Class
+### Our Molecule Class
    * Rely on MathSet for nearly all functionality via pimpl idiom
    * Fragmentation through MathSet's `Partition()` function with lambda/functor
    * This is fine for generating them, but now where do they live?  
