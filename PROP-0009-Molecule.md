@@ -208,25 +208,65 @@ We need to flush out some more use cases and also address element access.  This 
 Ultimately the goal of our interface is to have a syntax like:
 
 ```C++
-//Declare a CO2 molecule along the z-axis
-Atom C(6,{0.0,0.0,0.0});
-Atom O1(8,{0.0,0.0,-2.19});
-Atom O2(8,{0.0,0.0,2,19});
-Molecule CO2({C,O1,O2});
+//Within your module you are given a const Molecule
+const Molecule YourMolecule;
+//which contains the atoms as a MathSet
 
-/**** Sometime later, in some other function***/
+//This won't work because YourMolecule is const
+YourMolecule<<MyNewAtom;
 
-//Grab the C=O1 bond
-Molecule CO({CO2[0],CO2[1]});
+//If you want to add an atom you need to copy YourMolecule
+Molecule MyClone(YourMolecule);
 
-//Grab the O2 atom
-Molecule O2({CO2[2]});
+MyClone<<MyNewAtom;
+/** now only works if MyNewAtom is inside the universe MathSet is associated with
+*  
+*   More concretely, assume that the molecule in the input file is a water dimer, with the two
+*   waters being A and B respectively.  Now pretend YourMolecule is actually A.  If MyNewAtom is
+*   any of the atoms in B, then this works.  Usually when one is mainpulating molecules
+*   this is what they want to do, include other parts of the input molecule in the
+*   current computation or take some of them out.  These sorts of operatations work
+*   fine with a non-cost (the copy) molecule.
+*
+*   Now what happens if you actually want to add the element?  First we make a new universe:
+*/
+AtomSetUniverse NewUniverse;
 
-//Make another CO2
-Molecule CO2_2=CO+O2;
+//Then we add the atom
+NewUniverse<<MyNewAtom;
 
-//Print the carbon atom out
-std::cout<<CO[0]<<std::endl;
+//Then we add whatever other atoms we want to it as well
+NewUniverse<<SomeOtherAtom;
+
+//Finally we make our new molecule
+Molecule NewMolecule(NewUniverse);
+
+//This workflow keeps the actual atoms constant within the molecule, but allows fragmentation to occur
+//For common molecular operations, such as rotation/translation free-functions exist to do this for you
+Molecule MyRotatedMolecule=RotateMolecule(YourMolecule,RotationMatrix);
+
+/*For most modules manipulating the molecule should not be an issue, for example Hartree-Fock should not
+ * be manipulating the molecule, but for say a CP correction module we will have to modify it.
+ * So how do we do that?  Well again, we need to add elements to a universe (and not a molecule,
+ * which is a MathSet)
+ */
+
+Atom NewGhost=MakeGhost(MyNewAtom);
+//Make ghost is a function that turns MyNewAtom into a ghost atom and then returns it (ensures that
+//the internal flags are set consistently.  At the moment ghosts have Z=0, mass=0, no electrons)
+
+//Similarly we have free functions that check if an atom is ghost (again keeps track of the internal flags)
+bool GhostQuestionMark=IsGhost(NewGhost);
+
+/* Note that for a system that has ghost atoms, each atom will appear twice in NewUniverse, once as
+ * a real and once as a ghost (three times for point charges).  Admittidly this is somewhat odd, but
+ * the user shouldn't concern themselves with it because it ensures you get the syntax you expect:
+ */
+
+MyClone<<MakeGhost(OxygenFromWaterB);
+MyClone<<MakeGhost(Hydrogen1FromWaterB);
+MyClone<<MakeGhost(Hydrogen2FromWaterB);
+//Where we returned to our water dimer example
 
 ```
 ### Our Atom Class
