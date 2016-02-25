@@ -33,6 +33,8 @@ The point is as long as I can get the i-th component of your atom I don't care w
 ##### Atom
 The minimum public atom interface will contain functions that do the following:
 
+(put UML diagram back when design is more solidified)
+
 <!---
 ![Alt text](http://g.gravizo.com/g?
 /**
@@ -105,6 +107,8 @@ Otherwise the functions are:
 #### Molecule
 
 The minimum public interface of the molecule class should be:
+
+(put UML diagram back when design is more solidified)
 
 <!---
 ![Alt text](http://g.gravizo.com/g?
