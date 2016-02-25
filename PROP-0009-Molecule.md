@@ -1,4 +1,4 @@
-# PROP 0009 - Molecule
+# PROP 0009 - Molecule (and Atom)
 
 |                |                                           |
 |:---------------|:------------------------------------------|
@@ -16,19 +16,21 @@
  molecule aspect of the system.  The remainder, which we term Space will
  be the subject of another proposal.
  
-## APIs
+#### APIs
 
 The molecule will ultimately be made up of a set of atoms (or atomic centers).
 Here we layout what the minimum interface for a molecule should be, for the `Atom` and `Molecule` classes.
 Developers wishing to adopt their code to this interface should try to be consistent with our API.
-When implementing them I encourage developers to follow language precedent so long as all of these operations exist.
+When implementing your classes I encourage you to follow language precedent so long as all of these operations exist.
 For example, the `double Comp(int i)` function of the Atom class, described shortly, is in C++ most naturally expressed as `double operator[](int i)`.
+
+Ryan - I think there are two issues at play, what should our Atom/Molecule class do? And what functionality do we expect from other people's atom/molecule classes.  This section focuses on the latter.  Thus I motion we move some the following discussions to the next section.
 
 <!---
 The point is as long as I can get the i-th component of your atom I don't care what you call the function.  Yes, a true API specifies signatures, but I think a more realistic first step for our field is just to ensure we have common functionality.  In the next section we will describe how the atom and molecule classes are handled within the current module project.  Aside from the following API both atom and molecule must have a mechanism for deep copy, shallow copy is optional.
 -->
 
-### Atom
+##### Atom
 The minimum public atom interface will contain functions that do the following:
 
 <!---
@@ -57,11 +59,14 @@ public double Comp();
 }
 )
 -->
-
+<!--
 General notes atomic number and coordinates are expected to remain constant from construction so no setters are defined (*debatable*).
+-->
+
 When an atomic number is provided, reasonable defaults for all properties are expected to be set (such as the most common isotope).
 
 Otherwise the functions are:
+* **`Atom()`** -Default constructor, atom should be in a reasonable starting state
 * **`Atom(int Z,double x,double y, double z)`** - Constructor. Creates an atom with atomic number Z located at cartesian coordinates (`x`,`y`,`z`) (in bohr, au)
 * **`int Z()const`** - Returns the atomic Z number
 * **`int Isotope()const`** - Returns the isotope number (number of protons + neutrons?)
@@ -79,18 +84,25 @@ Otherwise the functions are:
 * **`void SetMass(double m)`** - Change the atomic mass to `m` (m in a.u.)
 * **`void SetChargeAndMult(double q,int m)`** - Change the charge to `q` (in a.u.) and multiplicity to `m`
 * **`void SetNElectrons(double N)`** - Sets the number of electrons to `N`. Double to allow for fractional occupation
+* **`void SetZ(int i)`** - Sets the atomic number
 
-#### Points of discussion
+##### Points of discussion
 
 * Allow changing of `Z` or of the coordinates
+  * Ryan - I'm going back on my original statement and think they should be modifiable.  We should rely on const-ness to enforce can/can't modify something (above statements have been modified)
 * Enforcing units to be a.u. (bohr) for coordinates.
+  * Ryan - All units, everywhere should be a.u. 
 * Should the class have a default constructor
+  * Ryan - I'm a big fan of default constructors 
 * Should the copy constructor and copy assignment be a deep copy
+  * Ryan - I think they should be sha 
 * Name of Coord(s) functions, and should `operator[]` be overloaded
   to mean the same thing
+  * Ryan -  For our implementation I think `operator[]` should definately be used
 * Should have indexing element?
+  * Ryan - I really hate the idea of referring to "Atom 1", but also realize it is very convienient sometimes. 
 
-### Molecule
+#### Molecule
 
 The minimum public interface of the molecule class should be:
 
@@ -147,28 +159,38 @@ not change it.  Similarly if something is returning
 **Note** - As written, there should be no assumption (at the interface level) as to the layout of
 the data (contiguousness, etc) to the developer using the library. I.e., there should be no `&GetAtom[0]` type stuff.
 
-#### Points of discussion
+##### Points of discussion
 
 * Should we allow changing of atom data via `GetAtom` and then changing it? Or should `GetAtom` return a copy
   * Ben - Changing my view slightly, and maybe it should be possible. It is generally what is expected
 and should be OK as long as parts of the molecule aren't shared with other molecules explicitly.
+  * Ryan - I think you should be able to edit the atoms if you have a non-const molecule
 * Should GetAtom return a reference or a copy? (somewhat depends on above)
   * Copying is relatively cheap and developers should not be doing expensive stuff through Atoms
-* Estimating the multiplicity of a molecule via multiplicity of atoms is not trivial.
-* How is symmetry stored
+  * Ryan - I think it should be a reference with the appropriate const-ness
 * No `SetCharge()`?
+  * Ryan - Need  this function, was an oversight.
 * Naming of set operations is awkward
+  * Ryan - They are, but in any reasonable language they would just be operators 
 * Should we allow large-scale changing to `this`? (ie, should `SelfSetAdd` or Rotate, Translate, etc, functions return a new Molecule rather than changing this).
   * `ReplaceAtom` ?
+  * Ryan - `SetlfSetAdd` is the equivalent to `operator+=` which conventionally returns `*this`.  I envision it more for building up the molecule, rather than working with the existing molecule
 * If no assumptions can be made about the contiguousness of the data, then the Rotate and Translate functions
 would probably have to be part of the class (to take advantage of contiguous data if it does exist).
   * Or could have a `RotateMolecule` class that is friends with Molecule? If that is so tightly coupled to the Molecule, then it should be part of molecule
   * Or `RotateMolecule` can be an inner class
+  * Based on Ben's tests of the time to rotate 50,000,000 atoms, using non-contigious memory (final time <10 seconds) I vote that Rotate/Translate be free functions or something similar as to maintain the sort of data/algorithm seperation
 * Fragments? Iterating over fragments?
-
-
+  * Ryan - For the API I think it's overkill, for our implementation discussed below 
+   
+<!-- Moved to our section
+ Estimating the multiplicity of a molecule via multiplicity of atoms is not trivial.
+ How is symmetry stored
+-->
 
 ## Features (of our implementation)
+We need to flush out some more use cases and also address element access.  This example relies on the "give me Atom 1" mindset.
+
 Ultimately the goal of our interface is to have a syntax like:
 
 ```C++
@@ -193,6 +215,28 @@ Molecule CO2_2=CO+O2;
 std::cout<<CO[0]<<std::endl;
 
 ```
-
- * Arbitrary nested fragments, that is each fragment is a perfectly good molecule and can be fragmented as well
- * Effeciency: memory for each atom is contigious allowing for BLAS calls on coordiantes, masses, charges, etc. This is done without duplicating data (basically there's some messy pointer redirection the user need not concern themselves with).
+### Design considerations
+#### Atom Class
+   * Contains its basis set
+   * Contains a nucleus subclass tracking isotope data as well as effective core potentials, finite nucleus, etc.
+   * Knows empirical physical data for that element, such as covalent/VDW raddii etc. (implemented via pointer to some const class)
+    
+#### Molecule Class
+   * Rely on MathSet for nearly all functionality via pimpl idiom
+   * Fragmentation through MathSet's `Partition()` function with lambda/functor
+   * This is fine for generating them, but now where do they live?  
+      * Merit in having a molecule keep track of its fragments.  
+      * At the same time, partitioning a set is a layer above the set and thus suggests that the set itself should be agnostic       * Can imagine our fragmented system is actually a MathSet of molecules
+   * Symmetry class containing point-group info, symmetry operatrions, character-table etc. (move to Symmetry page?)
+      * Thinking towards space groups and generating them from translations and point-groups, on the fly
+   * Connectivity data or maybe just a list of bonds, angles, torsions
+      * My thought here is that the connectivity data is very useful for say fragmenting 
+   * Some mechanism for generating internal coordinates/ Z-matrices, and accessing them.  
+      * Could be exterior factory or derived class.
+   * Automatic estimation of multiplicity.  
+      * Admittidly somewhat non-trivial, but given how much I hate term symbols, it would be great to have it automated.
+  
+<!--
+Arbitrary nested fragments, that is each fragment is a perfectly good molecule and can be fragmented as well
+ Effeciency: memory for each atom is contigious allowing for BLAS calls on coordiantes, masses, charges, etc. This is done without duplicating data (basically there's some messy pointer redirection the user need not concern themselves with).
+-->
