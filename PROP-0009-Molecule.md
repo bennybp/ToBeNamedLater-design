@@ -380,7 +380,8 @@ MyClone<<OA_Clone;//Will throw element out of range
 ```
 ### Our Atom Class
    * Contains its basis set
-   * Contains a nucleus subclass tracking isotope data as well as effective core potentials, finite nucleus, etc.
+     * Do ECPs go here? 
+   * Contains a nucleus subclass tracking isotope data as well as finite nucleus data
      * Should atomic number be moved here?
      * Should mass be moved here?
    * Knows empirical physical data for that element, such as covalent/VDW raddii etc. (implemented via pointer to some const class)
