@@ -208,71 +208,201 @@ We need to flush out some more use cases and also address element access.  This 
 Ultimately the goal of our interface is to have a syntax like:
 
 ```C++
-//Within your module you are given a const Molecule
+/* For concreteness throughout this example we assume the user has given us the water
+ * dimer and we label the two waters as A and B.  A's atoms are:
+ *
+ * OA
+ * HA1
+ * HA2
+ * 
+ * and B's are:
+ *
+ * OB
+ * HB1
+ * HB2
+ */
+ 
+//Within your module you will be given a const Molecule (probably by reference)
+//We assume YourMolecule={WaterA,WaterB}
 const Molecule YourMolecule;
-//which contains the atoms as a MathSet
 
-//This won't work because YourMolecule is const
-YourMolecule<<MyNewAtom;
+/* This molecule contains the atoms as a MathSet.  A MathSet aliases the actual
+ * elements in it to a more managable type (specifically an integer) and performs
+ * all set-like operations on the integers rather than the elements themselves.
+ * Because there is a one-to-one mapping between the integers and the elements
+ * it's as if we manipulated the elements themself; however, manipulating the
+ * integers is far more effecient in terms of speed and memory, which is important
+ * for scenarios in which we have lots of molecules floating around (particularly
+ * things like the many-body expansion and finite-difference computations).  How
+ * the atoms are actually stored is somewhat of an implementation detail.  What's
+ * more important is how to use the Molecule class.
+ *
+ * The molecule class enforces that the actual atoms themselves are const.
+ * (We are also assuming for simplicity that the atom indices map to the
+ * elements of A than B in the order above):
+ */
+const Atom& OA=YourMolecule[0];
 
-//If you want to add an atom you need to copy YourMolecule
+//You are free to copy the atom
+Atom OA_Clone(OA);
+
+//and now you can change it for example we can give it a silly mass:
+OA_Clone.SetMass(255);
+
+//For a number of reasons, the most important of which is that YourMolecule
+//is const, this won't work:
+YourMolecule<<OA_Clone; //<---Won't work, won't even compile
+
+//So let's pretend you are set on adding this atom so you try copying:
 Molecule MyClone(YourMolecule);
 
-MyClone<<MyNewAtom;
-/** now only works if MyNewAtom is inside the universe MathSet is associated with
-*  
-*   More concretely, assume that the molecule in the input file is a water dimer, with the two
-*   waters being A and B respectively.  Now pretend YourMolecule is actually A.  If MyNewAtom is
-*   any of the atoms in B, then this works.  Usually when one is mainpulating molecules
-*   this is what they want to do, include other parts of the input molecule in the
-*   current computation or take some of them out.  These sorts of operatations work
-*   fine with a non-cost (the copy) molecule.
-*
-*   Now what happens if you actually want to add the element?  First we make a new universe:
-*/
-AtomSetUniverse NewUniverse;
+//This Still won't work:
+MyClone<<OA_Clone;//Will throw element out of range
 
-//Then we add the atom
-NewUniverse<<MyNewAtom;
-
-//Then we add whatever other atoms we want to it as well
-NewUniverse<<SomeOtherAtom;
-
-//Finally we make our new molecule
-Molecule NewMolecule(NewUniverse);
-
-//This workflow keeps the actual atoms constant within the molecule, but allows fragmentation to occur
-//For common molecular operations, such as rotation/translation free-functions exist to do this for you
-Molecule MyRotatedMolecule=RotateMolecule(YourMolecule,RotationMatrix);
-
-/*For most modules manipulating the molecule should not be an issue, for example Hartree-Fock should not
- * be manipulating the molecule, but for say a CP correction module we will have to modify it.
- * So how do we do that?  Well again, we need to add elements to a universe (and not a molecule,
- * which is a MathSet)
+/* To understand why this won't work you have to recall that we have a MathSet
+ * and not a Universe.  We can only add new elements to a universe.  We can
+ * only add elements in the universe to the MathSet.  Our universe is:
+ *
+ * {OA,HA1,HA2,OB,HB1,HB2}
+ *
+ * which clearly doesn't contain OA_Clone.  Note we could do (although it
+ * won't actually do anything since OA is already in our molecule):
  */
+ MyClone<<YourMolecule[0];
+ 
+ /* At this point manipulations of the Molecule may seem limited, but as
+  * far as I can tell the most common manipulations are of the form:
+  *
+  * (Discussion note, Molecule needs to be default constructable for this
+  * to work)
+  */
+   Molecule WaterA,WaterB;
+   WaterA=NewMolecule.Fragment(
+      [](const Atom& AnAtom){return AnAtom.Index()<3;});
+   WaterB=NewMolecule.Fragment(
+      [](const Atom& AnAtom){ return AnAtom.Index()>2;});
+  
+  /* These operations do exactly what you expect, they split the dimer
+   * into it's two monomers.  In the lambda we could have used any of the
+   * Atom's properties to perform the spilt, e.g. split by oxygen vs. hydrogen,
+   * or by distance from some point.
+   *
+   * Hopefully you are beginning to see that this syntax is actually quite
+   * powerful, but we still haven't addressed how we actually change an atom.
+   * Rather than trying to add our silly clone.  Let's set up the counterpoise
+   * correction.  Recall that we can only add new atoms to a universe, so we
+   * make a new universe.
+   */
+  AtomSetUniverse NewUniverse;
 
-Atom NewGhost=MakeGhost(MyNewAtom);
-//Make ghost is a function that turns MyNewAtom into a ghost atom and then returns it (ensures that
-//the internal flags are set consistently.  At the moment ghosts have Z=0, mass=0, no electrons)
+  //Now we add the original atoms to it (these atoms will be deep copied)
+  for(const Atom& AtomI : YourMolecule){
+     NewUniverse<<AtomI;
+     //Now the key step, we add ghost versions as well
+     NewUniverse<<MakeGhost(AtomI);
+  }
+  /* The MakeGhost function is a predefined free-function that sets
+   * the appropriate flags for you so that the atom will be recognized
+   * as a ghost atom (currently sets Z=0, mass=0, and number of electrons
+   * to 0).  You should not attempt to set the flags yourself incase they
+   * change, in which case we only need to update the MakeGhost function
+   * to propagate the changes.
+   */
+  
+  //And we now turn our universe into a Molecule
+  Molecule NewMolecule(NewUniverse);
+  
+  /* At this point our new universe (and our NewMolcule) look 
+   * like (@ denotes a ghost version):
+   *
+   * {OA,@OA,HA1,@HA1,HA2,@HA2,OB,@OB,HB1,@HB1,HB2,@HB2}
+   *
+   * I realize this is very non-standard, but the average user will never
+   * need to consider this detail and mathematically it actually makes a
+   * lot of sense since OA!=@OA, that is they really are different elements of
+   * a universe.  
+   * 
+   * (Discussion note: when are two atoms equal, i.e. can we use the atoms that
+   * are currently in WaterA and WaterB or do we have to remake those monomers?)
+   *
+   * For the puroposes of this demo, we remake the real molecules until the above
+   * discussion point is addressed (note that the ghost atoms have odd indices).
+   *
+   */
+   Molecule RealA,RealB;
+   RealA=NewMolecule.Fragment(
+      [](const Atom& AnAtom){return AnAtom.Index()<5 && AnAtom.Index()%2==0;});
+   RealB=NewMolecule.Fragment(
+      [](const Atom& AnAtom){ return AnAtom.Index()>5 && AnAtom.Index()%2==0;});
 
-//Similarly we have free functions that check if an atom is ghost (again keeps track of the internal flags)
-bool GhostQuestionMark=IsGhost(NewGhost);
-
-/* Note that for a system that has ghost atoms, each atom will appear twice in NewUniverse, once as
- * a real and once as a ghost (three times for point charges).  Admittidly this is somewhat odd, but
- * the user shouldn't concern themselves with it because it ensures you get the syntax you expect:
- */
-
-MyClone<<MakeGhost(OxygenFromWaterB);
-MyClone<<MakeGhost(Hydrogen1FromWaterB);
-MyClone<<MakeGhost(Hydrogen2FromWaterB);
-//Where we returned to our water dimer example
-
+   //Now we add B's atoms as ghosts to A
+   WaterA=RealA;
+   for(const Atom& AnAtom : RealB)
+      WaterA<<MakeGhost(AnAtom);
+   
+   //and vice versa
+   WaterB=RealB;
+   for(const Atom& AnAtom: RealA)
+      WaterB<<MakeGhost(AnAtom);
+   
+   /* Note a few things:
+    *
+    * WaterA=RealA actually changes the universe WaterA is linked to. It does not change
+    * the elements within that universe.  Furthermore, since RealA contains
+    * a const Universe (through MathSet) this does not allow WaterA to actually change atoms
+    * in its new universe.
+    *
+    * Adding ghosts to WaterA/WaterB does not change the universe since the ghosts are already
+    * in it.  We are just adding that ghost's index to WaterA/WaterB.
+    *
+    * Much of what is being discussed here is somewhat implementation details because in
+    * a typical module, say Hartree-Fock, you are just going to use the Molecule you are
+    * handed, you are not going to change it.
+    *
+    * Now we point out how to get say only the real atoms:
+    */
+    Molecule RealAtoms=SomeOtherMolecule.Fragment([](const Atom& AnAtom){return IsReal(AnAtom);});
+    
+    /* IsReal is a function that checks the atom for internal flags and returns true if its input
+     * is not a ghost atom, dummy atom, or a point charge.  Similar functions: IsGhost, IsDummy, and
+     * IsPointCharge exist.  As other atom types are added please update this statement.
+     *
+     * The last sort of common molecular manipulation that one may need to do is rotate/translate.
+     * We provide free functions for that as well:
+     */
+     Molecule MovedMolecule=Reorient(WaterA,RotationMatrix,TranslationVector);
+     
+     /* Internally, Reorient, makes a new universe, copies each atom, repositions it, adds
+      * that atom to the new universe, and then finally adds that universe to a new molecule,
+      * which it returns.  Again, this ensures that the atoms inside WaterA do not change.
+      * Note that any link between MovedMolecule and WaterA is broken.
+      */
 ```
 ### Our Atom Class
    * Contains its basis set
    * Contains a nucleus subclass tracking isotope data as well as effective core potentials, finite nucleus, etc.
+     * Should atomic number be moved here?
+     * Should mass be moved here?
    * Knows empirical physical data for that element, such as covalent/VDW raddii etc. (implemented via pointer to some const class)
+   * The above are likely going to be the same for all atoms with the same atomic number, 
+      * I therefore propose they are shared ptrs to const instances so they can be compared quickly by comparing addresses
+      * The const-ness assures that you have to change what the pointer points to to modify the properties
+      * Because Atoms are only returned by copy or const reference modifying these properties only modifies them in the copy which in turn can not be reinserted into the molecule because it is no longer in the universe within that molecule.
+   * We neeed to discuss what equality of atoms means
+     * I propose the following must be equal:
+       * atomic number
+       * charge
+       * mass
+       * number of electrons
+       * multiplicity
+       * coordinates
+       * nucleus subclass
+       * empirical physical data
+       * basis set
+     * In particular this ignores the index, because in my mind, it is a relative position in a universe used for quickly accessing a particular atom.
+     * This definition would allow the following very useful scenario.  Let a and b be molecules with universes A and B respectively.  Now let A be a proper subset of B.  Even though b belongs to a different universe and thus its atoms may have different indices, operations like B+=A would still work
+        * As universe/MathSet stand I don't think this would quite work because I think we assume the universe are the same for union.  Hence we would need to change checks to is subset (note if A==B a is still a subset of B (and vice versa)).
+     
     
 ### Our Molecule Class
    * Rely on MathSet for nearly all functionality via pimpl idiom
