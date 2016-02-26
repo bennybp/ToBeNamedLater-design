@@ -8,7 +8,10 @@
 
 ## Purpose
 
-To define standard basis set functionality
+To define standard basis set functionality.
+Serious point of discussion, our proposed Molecule is not compliant with this interface.  Do we want BasisSet to take a System
+and wrap the loops to pull the data out?  Actually would work kinda nice as we could have code to deal with ghost atoms in
+one place, i.e. inside the BasisSet object.
 
 ## API
 
