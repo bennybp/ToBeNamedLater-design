@@ -97,7 +97,9 @@ lead to more readable and maintainable code.
     * Very low overhead
     * Provides better copy and move semantics, as well as iterators
   * Consider replacing `std::map` with `std::unordered_map` and `std::multimap` with `std::unordered_multimap`
-    if ordering is not important (is basically a drop-in replacement and can result is some decent speedup).
+    if ordering is not important, but speed is
+    * Careful - hashes not guarenteed to be the same across program incarnations
+    * Otherwise, is basically a drop-in replacement and can result is some decent speedup
 
 
 
