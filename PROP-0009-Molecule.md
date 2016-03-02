@@ -18,189 +18,148 @@
 
 ## Purpose
 
- In chemistry we are interested in molecules and their environments
- and want to perform compuations on these "systems".  The system may
- contain multipole moments, implicit solvation (usually through multipole
- moments), electric fields, magnetic fields, extra basis functions,
- points of reference, etc.  This proposal really just focuses on the
- molecule aspect of the system.  The remainder, which we term Space will
- be the subject of another proposal.
+In chemistry we are interested in molecules and their environments
+and want to perform compuations on these "systems".  The system may
+contain multipole moments, implicit solvation (usually through multipole
+moments), electric fields, magnetic fields, extra basis functions,
+points of reference, etc.  This proposal really just focuses on the
+molecule aspect of the system.  The remainder, which we term Space will
+be the subject of another proposal.
  
-#### APIs
 
+
+
+<!---
+#### APIs
 The molecule will ultimately be made up of a set of atoms (or atomic centers).
 Here we layout what the minimum interface for a molecule should be, for the `Atom` and `Molecule` classes.
 Developers wishing to adopt their code to this interface should try to be consistent with our API.
 When implementing your classes I encourage you to follow language precedent so long as all of these operations exist.
+
 For example, the `double Comp(int i)` function of the Atom class, described shortly, is in C++ most naturally expressed as `double operator[](int i)`.
 
 Ryan - I think there are two issues at play, what should our Atom/Molecule class do? And what functionality do we expect from other people's atom/molecule classes.  This section focuses on the latter.  Thus I motion we move some the following discussions to the next section.
 
-<!---
 The point is as long as I can get the i-th component of your atom I don't care what you call the function.  Yes, a true API specifies signatures, but I think a more realistic first step for our field is just to ensure we have common functionality.  In the next section we will describe how the atom and molecule classes are handled within the current module project.  Aside from the following API both atom and molecule must have a mechanism for deep copy, shallow copy is optional.
 -->
 
-##### Atom
+
+## Atom
+
 The minimum public atom interface will contain functions that do the following:
 
 (put UML diagram back when design is more solidified)
 
-<!---
-![Alt text](http://g.gravizo.com/g?
-/**
-*@opt nodefontsize 14
-*@hidden
-*/
-class UMLOptions{}
-/**
-*@opt all
-*@note Class for an atom
-*/
-class Atom{
-public Atom();
-public double Mass();
-public void SetMass();
-public double Charge();
-public void SetChargeAndMult();
-public int Mult();
-public string Symbol();
-public int Z();
-public double NElectrons();
-public void SetNElectrons();
-public double Comp();
-}
-)
--->
-<!--
-General notes atomic number and coordinates are expected to remain constant from construction so no setters are defined (*debatable*).
--->
 
-When an atomic number is provided, reasonable defaults for all properties are expected to be set (such as the most common isotope).
+### Constructors
 
-Otherwise the functions are:
 * **`Atom()`** -Default constructor, atom should be in a reasonable starting state
-* **`Atom(int Z,double x,double y, double z)`** - Constructor. Creates an atom with atomic number Z located at cartesian coordinates (`x`,`y`,`z`) (in bohr, au)
-* **`int Z()const`** - Returns the atomic Z number
-* **`int Isotope()const`** - Returns the isotope number (number of protons + neutrons?)
-* **`double Coord(int i)const`** - Returns the i-th Cartesian component in a.u.
-* **`std::string Symbol()const`** - Returns the atomic symbol of the atom
-* **`std::string Name()const`** - Returns the elemental name of the atom
-* **`double Mass()const`** - Returns the atomic mass, in a.u.
-* **`double IsotopeMass()const`** - Return the mass of the currently-selected isotope
-* **`double Charge()const`** - Returns the charge of the atom, in a.u. In general this should be Z less the number of electrons, and should be a double to support say MM charges
-* **`int Mult()const`** - Returns the multiplicity of the atom
-* **`double NElectrons()const`** - Returns the number of electrons. Double to allow for fractional occupation
+* **`Atom(int idx, Coords xyz, int Z, int isonum, double charge, double multiplicity, double nelectrons)`** - Constructor. Creates an atom with all the information filled in
+* **`Atom(int idx, double x, double y, double z, int Z, int isonum, double charge, double multiplicity, double nelectrons)`** - Constructor. Creates an atom with all the information filled in
 
-* **`void SetIsotope(int i)`** - Set the isotope number
-* **`void SetCoords(double x, double y, double z)const`** - Set the coordinates of the atom
-* **`void SetMass(double m)`** - Change the atomic mass to `m` (m in a.u.)
-* **`void SetChargeAndMult(double q,int m)`** - Change the charge to `q` (in a.u.) and multiplicity to `m`
-* **`void SetNElectrons(double N)`** - Sets the number of electrons to `N`. Double to allow for fractional occupation
-* **`void SetZ(int i)`** - Sets the atomic number
+### Basic properties
 
-##### Atom Discussion
-
-* Allow changing of `Z` or of the coordinates
-  * Ryan - I'm going back on my original statement and think they should be modifiable.  We should rely on const-ness to enforce can/can't modify something (above statements have been modified)
-* Enforcing units to be a.u. (bohr) for coordinates.
-  * Ryan - All units, everywhere should be a.u. 
-* Should the class have a default constructor
-  * Ryan - I'm a big fan of default constructors 
-* Should the copy constructor and copy assignment be a deep copy
-  * Ryan - I think they should be sha 
-* Name of Coord(s) functions, and should `operator[]` be overloaded
-  to mean the same thing
-  * Ryan -  For our implementation I think `operator[]` should definately be used
-* Should have indexing element?
-  * Ryan - I really hate the idea of referring to "Atom 1", but also realize it is very convienient sometimes. 
-
-#### Molecule
-
-The minimum public interface of the molecule class should be:
-
-(put UML diagram back when design is more solidified)
-
-<!---
-![Alt text](http://g.gravizo.com/g?
-/**
-*@opt nodefontsize 14
-*@hidden
-*/
-class UMLOptions{}
-/**
-*@opt all
-*@note Class for a molecule
-*/
-class Molecule{
-public Atom GetAtom();
-public void AddAtom();
-public double Charge();
-public int Mult();
-public double NElectrons();
-public void SelfCombine();
-public void SelfSetDiff();
-public void SelfIntersection();
-}
-)
--->
-
-Again, I expect the molecule to provide reasonable defaults to charge
-and multiplicity, which are updated as atoms are added (removing atoms
-is optional, but if supported then this should also be accounted for).
-
-* **`Atom GetAtom(int i)const`** - Returns the `i`-th atom in the molecule as the Atom class
-* **`double Charge()const`** - Returns the charge of the molecule, in a.u. (double to support fractional charges)
-* **`double NElectrons()const`** - Returns the number of electrons. Must be a double to support fractional numbers
-* **`int Mult()const`** - Returns the multiplicity of the molecule
+Most properties are accessed by conventional getter/setter methods. Getter methods return copies of the
+property.
+A `CoordType` is a typedef for `std::array<double, 3>`.
 
 
-* **`void AddAtom(const Atom& i)`** - Adds atom i to the molecule
+| Getter                              |Setter                                 | Description                                                                  |
+|-------------------------------------|---------------------------------------|------------------------------------------------------------------------------|
+| **`size_t GetIdx() const`**          | (none)                                | Unique atom index (usually input ordering)                                   |
+| **`int GetZ() const`**               | **`void SetZ(int)`**                   | Atomic Z number (number of protons)                                          |
+| **`int GetIsonum() const`**          | **`void SetIsonum(int)`**              | Isotope number (protons + neutrons)                                          |
+| **`double GetMass() const`**         | **`void SetMass(double)`**             | Atomic mass (in amu, weighted average of isotope masses                      |
+| **`double GetIsotopeMass() const`**  | **`void SetIsotopeMass(double)`**      | Mass of this particular isotope (in amu)                                     |
+| **`double GetCharge() const`**       | **`void SetCharge(double)`**           | Charge on this atom / center                                                 |
+| **`double GetMultiplicity() const`** | **`void SetMultiplicity(double)`**     | Electronic spin multiplicity (2S+1)                                          |
+| **`double GetNElectrons() const`**   | **`void SetNElectrons(double)`**       | Number of electrons on this atom / center                                    |
+| **`CoordType GetCoords() const`**    | **`void SetCoords(const CoordType &)`**<br />**`void SetCoords(double, double, double)`** | Coordinates of this center (in au)    |
+| **`double GetCoord(int)`**           | **`void SetCoord(int, double)`**       | Get/Set and individual component of the coordinates                          |
 
-* **`double Coord(int i,int j)const`** returns the `j`-th Cartesian component of the `i`-th atom , in a.u.
+Copy construction and assigment operations (with both references and rvalue references) are required.
+Overloads for `operator[]` may be provided for the coordinates, returning a reference.
+The comparison operators `operator==` and `operator!=` should also be provided.
 
-* **`void SelfSetAdd(const Molecule& Other)`** - Makes current molecule the union of this molecule and other
-* **`void SelfSetDiff(const Molecule& Other)`** - Makes current molecule the set difference (the elements unique to the first set) of this and other
-* **`void SelfIntersection(const Molecule& Other)`** - Removes from this molecule any atoms not in other
-* **`void Rotate(const LocalMatrix & mat)`** - Rotate the molecule given a rotation matrix
-* **`void Translate(const LocalVector & v)`** - Translate the molecule
+
+### Free functions
+
+The `CreateAtom` free functions are used to create an atom based only on Z and coordinates (and optionally isotope number), which
+creates an atom with the other data fill in with reference values.
+
+
+### Basis function information
+
+Basis functions on the center are to be stored with the other atom information. This is a map of
+an arbitrary label string (representing the purpose of the basis set, ie "primary" or "density fitting") to a
+vector of shell information.
+
+* **`ShellInfoMap GetAllShells() const`** - Return all basis function information stored with this atom
+* **`ShellInfoVector GetShells(std::string) const`** - Get all the shells associated with a particular basis set label
+* **`void SetShells(std::string, ShellInfoVector)`** - Set/replace all the shells for a given label
+* **`void AddShell(std::string, ShellInfo)`**    - Add a shell to a particular label
+
+
+
+## Molecule
+
+A Molecule is a read-only view of a collection of Atoms. This collection of Atoms is called the universe of atoms.
+
+The Molecule is, strictly, **immutable**. Once an atom is added to a universe, it cannot be changed directly.
+Once a Molecule is constructed from a given universe, then that universe is immutable when accessed via the
+Molecule.  This allows for shallow-copy semantics without needing to worry about other parts of the code
+changing the underlying data. Any changes to the Atoms within the Molecule require constructing a new
+Molecule.
+
+The only changes allowed for a (non-const) Molecule is the changing of what Atoms (from the universe)
+constitute the Molecule.
+
+
+* **`int NAtoms() const`** - Number of atoms in this Molecule (not the universe)
+* **`double GetCharge()const`** - Returns the charge of the molecule, in a.u. (double to support fractional charges)
+* **`void SetCharge(double)`** - Set the charge of the molecule, in a.u. (double to support fractional charges)
+* **`double GetNElectrons()const`** - Returns the number of electrons. Must be a double to support fractional numbers
+* **`void SetNElectrons(double)`** - Set the number of electrons. Must be a double to support fractional numbers
+
+
+* **`bool HasAtom(size_t) const`** - See if this Molecule contains an Atom with a specific global index
+* **`Atom GetAtom(int i)const`** - Returns the `i`-th Atom in the Molecule (by copy).
 * **`begin(), end()`** - Iterate over all atoms
- 
-One is free to provide additional functionality beyond this, but not
-required.  For languages not supporting `const` the spirit of the const
-is expected to be upheld, i.e. if an argument is a `const &` you better
-not change it.  Similarly if something is returning
 
+* **`Point CenterOfMass(void) const`** - Calculate the mass-weighted
+* **`Point CenterOfNuclearCharge(void) const`** - Calculate the Z-weighted center
+* **`Molecule Translate(Vector) const`** - Translate the molecule
+* **`Molecule Rotate(Matrix) const`** - Rotate the molecule
+
+* **`void Insert(const Atom &) const`** - Inserts an atom (must already be a part of the universe of this Molecule
+* **`Molecule Partition(SelectorFunc) const`** - Return a subset of the Molecule based on a selection function. Universe is preserved.
+* **`Molecule Transform(TransformerFunc) const`** - Return a subset of the Molecule based on a selection function. Universe is preserved.
+* **`Molecule Complement(void) const`** - Returns a Molecule containing all Atoms in the universe that are not part of this Molecule
+* **`Molecule Intersection(const Molecule &) const`** - Returns a Molecule containing all Atoms that are both in this Molecule and another Molecule. Must share universes.
+* **`Molecule Union(const Molecule &) const`** - Returns a Molecule that combines this Molecule and another Molecule. Must share universes.
+* **`Molecule Difference(const Molecule &) const`** - Returns a Molecule that contains the difference between this Molecule and another
+
+* **`BasisSet GetBasisSet(const std::string &) const`** - Get the basis set (with the specified label) associated with this Molecule.
+
+
+A `SelectorFunc` is a function or functor (or lambda) that takes a `const Atom &` as an argument
+and returns true if that atom should be included in the new molecule. Similarly, a `TransformerFunc`
+takes a `const Atom &` and returns a new, transformed Atom to be included in the new Molecule.
+
+The copy constructor and assignment operator all shallow-copy the universe to the new Molecule.
+ 
 **Note** - As written, there should be no assumption (at the interface level) as to the layout of
 the data (contiguousness, etc) to the developer using the library. I.e., there should be no `&GetAtom[0]` type stuff.
 
-##### Molecule Discussion
 
-* Should we allow changing of atom data via `GetAtom` and then changing it? Or should `GetAtom` return a copy
-  * Ben - Changing my view slightly, and maybe it should be possible. It is generally what is expected
-and should be OK as long as parts of the molecule aren't shared with other molecules explicitly.
-  * Ryan - I think you should be able to edit the atoms if you have a non-const molecule
-* Should GetAtom return a reference or a copy? (somewhat depends on above)
-  * Copying is relatively cheap and developers should not be doing expensive stuff through Atoms
-  * Ryan - I think it should be a reference with the appropriate const-ness
-* No `SetCharge()`?
-  * Ryan - Need  this function, was an oversight.
-* Naming of set operations is awkward
-  * Ryan - They are, but in any reasonable language they would just be operators 
-* Should we allow large-scale changing to `this`? (ie, should `SelfSetAdd` or Rotate, Translate, etc, functions return a new Molecule rather than changing this).
-  * `ReplaceAtom` ?
-  * Ryan - `SetlfSetAdd` is the equivalent to `operator+=` which conventionally returns `*this`.  I envision it more for building up the molecule, rather than working with the existing molecule
-* If no assumptions can be made about the contiguousness of the data, then the Rotate and Translate functions
-would probably have to be part of the class (to take advantage of contiguous data if it does exist).
-  * Or could have a `RotateMolecule` class that is friends with Molecule? If that is so tightly coupled to the Molecule, then it should be part of molecule
-  * Or `RotateMolecule` can be an inner class
-  * Based on Ben's tests of the time to rotate 50,000,000 atoms, using non-contigious memory (final time <10 seconds) I vote that Rotate/Translate be free functions or something similar as to maintain the sort of data/algorithm seperation
-* Fragments? Iterating over fragments?
-  * Ryan - For the API I think it's overkill, for our implementation discussed below 
-   
-<!-- Moved to our section
- Estimating the multiplicity of a molecule via multiplicity of atoms is not trivial.
- How is symmetry stored
--->
+## Fragmentation
+
+Fragmentation information is not included within the Molecule class. Discussions are
+ongoing on exactly how a Molecule may be fragmented, but seems fairly settled on
+a free function/class/module that returns a map of Molecules based on some criteria (user-defined).
+Similar for connectivity.
+
+
 
 ## Features of our implementation
 We need to flush out some more use cases and also address element access.  This example relies on the "give me Atom 1" mindset.
@@ -378,6 +337,10 @@ MyClone<<OA_Clone;//Will throw element out of range
       * Note that any link between MovedMolecule and WaterA is broken.
       */
 ```
+
+
+<!---
+
 ### Our Atom Class
    * Contains its basis set
      * Do ECPs go here? 
@@ -420,7 +383,6 @@ MyClone<<OA_Clone;//Will throw element out of range
    * Automatic estimation of multiplicity.  
       * Admittidly somewhat non-trivial, but given how much I hate term symbols, it would be great to have it automated.
   
-<!--
 Arbitrary nested fragments, that is each fragment is a perfectly good molecule and can be fragmented as well
  Effeciency: memory for each atom is contigious allowing for BLAS calls on coordiantes, masses, charges, etc. This is done without duplicating data (basically there's some messy pointer redirection the user need not concern themselves with).
 -->
