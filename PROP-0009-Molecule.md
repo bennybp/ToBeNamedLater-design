@@ -117,10 +117,11 @@ constitute the Molecule.
 
 * **`int NAtoms() const`** - Number of atoms in this Molecule (not the universe)
 * **`double GetCharge()const`** - Returns the charge of the molecule, in a.u. (double to support fractional charges)
+* **`void GetSumCharge()const`** - Returns the sum of the charges of all the atoms
 * **`void SetCharge(double)`** - Set the charge of the molecule, in a.u. (double to support fractional charges)
 * **`double GetNElectrons()const`** - Returns the number of electrons. Must be a double to support fractional numbers
+* **`double GetSumNElectrons()const`** - Returns the sum of the number of electrons of all the atoms
 * **`void SetNElectrons(double)`** - Set the number of electrons. Must be a double to support fractional numbers
-
 
 * **`bool HasAtom(size_t) const`** - See if this Molecule contains an Atom with a specific global index
 * **`Atom GetAtom(int i)const`** - Returns the `i`-th Atom in the Molecule (by copy).
