@@ -1,0 +1,30 @@
+# Terminology
+
+# Purpose
+The purpose of this proposal is to solidfy and create a uniform terminology to be used throughout the module project when
+refferring to concepts and ideas that are unique to this project.
+
+# Main Terms
+
+Terms in this section represent core concepts of the module project.
+
+## Module
+
+Modules are the core component of this project.  Modules represent different ways to do the same task.  Imagine a module for sorting,
+``different ways" in this context would be a module that sorts via ``bubble sort" vs. one that uses ``merge sort".  They may also
+be different in the sense of who coded them or what package they belong to; Ryan's ``bubble sort" vs. Ben's "bubble sort".  Each
+module must adhere to a specified interface to ensure that it is swappable with any other module that accomplishes the same task.
+
+## Supermodule
+
+Supermodules are collections of modules that are meant to be used together.  Often these modules will share common dependencies
+or common authors.  Eventually, it is our goal that, a particular electronic structure package, say Psi4, will be distributed
+entirely as a supermodule.
+
+## Module Base Type
+
+RMR-I was starting to call this ``concept" in line with C++, but noticed BP was using the term Module Base Type
+
+This is the task a module accomplishes.  It is also the API that every task accomplishing this task must adhere to.  Returning
+to the sort example, a sorting module would be the module base type.
+
