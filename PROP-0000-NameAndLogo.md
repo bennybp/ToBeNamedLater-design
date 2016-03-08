@@ -20,11 +20,10 @@ does not represent an accaptable solution.
 
 ## Proposals
 
-  * **Pluginplay** (a play on "plug-and-play" (PnP) computer hardware concept
-    * Ryan's favorite so far
-    * Domain is open
-    * Ben and Lori both think it doesn't represent the chemistry/QM applications
-    * People (and search engines) may confuse it for "plug-and-play"
+* **Pluginplay** (a play on "plug-and-play" (PnP) computer hardware concept
+  * Domain is open
+  * Ben and Lori both think it doesn't represent the chemistry/QM applications
+  * People (and search engines) may confuse it for "plug-and-play"
 * **Quasar**
   * Attempts to backronym:
     * Q=quantum 
@@ -34,10 +33,10 @@ does not represent an accaptable solution.
     * A=at
     * R=Runtime,research
 * **Pulsar**
- * Attempts to backronym: 
-   * P=plugin
-   * U=utilities
-   * L=library, linking
-   * S=Science
-   * A=at, advancing
-   * R=Runtime,research
+  * Attempts to backronym: 
+    * P=plugin
+    * U=utilities
+    * L=library, linking
+    * S=Science
+    * A=at, advancing
+    * R=Runtime,research
