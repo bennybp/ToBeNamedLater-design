@@ -25,4 +25,19 @@ does not represent an accaptable solution.
     * Domain is open
     * Ben and Lori both think it doesn't represent the chemistry/QM applications
     * People (and search engines) may confuse it for "plug-and-play"
-
+* **Quasar**
+  * Attempts to backronym:
+    * Q=quantum 
+    * U=utilities 
+    * A=advancing,aiding
+    * S=science 
+    * A=at
+    * R=Runtime,research
+* **Pulsar**
+ * Attempts to backronym: 
+   * P=plugin
+   * U=utilities
+   * L=library, linking
+   * S=Science
+   * A=at, advancing
+   * R=Runtime,research
