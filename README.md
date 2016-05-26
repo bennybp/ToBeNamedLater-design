@@ -1,6 +1,6 @@
-# ToBeNamedLater-design
+# Pulsar-design
 
-This repository contains design documents related to what is currently being called "the module project".  The goals of the project are:
+This repository contains design documents related to Pulsar.  The goals of the project are:
 
 1. Provide a uniform top-level interface conducive to contributions from multiple groups and developers through encapsulation.
 2. Provide a mid-level set of tools that allow new theories to be developed and tested in a minimal amount of time.
