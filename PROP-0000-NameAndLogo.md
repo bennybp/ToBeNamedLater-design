@@ -13,12 +13,16 @@ the name and logo should be.
 
 ## Current Status
 
+The project is now officially named Pulsar.  A logo is still needed.
+
+## Previous Statuses
+
 At the moment this project is being referred to as "bpmodule" or "the
 module project" until some consensus has been reached.  Obviously this
 does not represent an accaptable solution.
 
 
-## Proposals
+## Name Proposals
 
 * **Pluginplay** (a play on "plug-and-play" (PnP) computer hardware concept
   * Domain is open
