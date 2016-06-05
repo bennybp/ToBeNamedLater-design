@@ -34,6 +34,8 @@ I propose a tensor "class" that conceptually has this structure:
   }
 )
 
+Each API is meant to abstract away the details of the API below it.  For the inner APIs it is probably best to adapt a relatively simple API like [BTAS](http://itensor.org/btas/).
+
 * User API is what the user goes through.
   * This is where we implement things we want and are unlikely to be found in all tensor libraries, like views and spatial symmetry.
 * Tensor API is the generic mathematical guts of the tensor.
@@ -43,10 +45,10 @@ I propose a tensor "class" that conceptually has this structure:
 * Distributed API abstracts away which particular distributed library we are using
 
 ## Shared and Distributed APIs
-It's probably easiest to work backwards in terms of what we want from each API.  The shared and distributed APIs should have common interfaces, possibly the [BTAS](http://itensor.org/btas/) interface.  I expect to use existing
-libraries for the actual implementations.  The implementations are what actually perform the contractions, permutations, etc.  It may be worth 
+It's probably easiest to work backwards in terms of what we want from each API. I expect to use existing
+libraries for the actual implementations. The implementations are what actually perform the contractions, permutations, etc. Adding support for a new implementation means writing an adaptor class that forces it into our Shared/Distributed API.  
 
-For shared there is:
+For shared implementations there is:
 
 * [libtensor](https://github.com/epifanovsky/libtensor)
   * Krylov group
@@ -64,7 +66,7 @@ For shared there is:
 * [Ambit](https://github.com/jturney/ambit)
   * Will let Jet describe
 
-For distributed there is:
+For distributed implementations there is:
 
 * [Cyclops Tensor Framework](https://github.com/solomonik/ctf)
   * Solomonik group
@@ -80,8 +82,7 @@ For distributed there is:
   * Lazy evaluation pseduo supported (wiki desribes how to implement your own)
 
 ## What a Tensor API Needs To Do
- The Tensor API provides a common interface to the underlying Distributed and Shared APIs.  For this section libraries refer to the choices for the distributed and shared APIs.  It also serves as an insultating layer protecting our added
- features from the actual features of the libraries.  I think it should do the following:
+ The Tensor API provides a common interface to the underlying Distributed and Shared APIs. It also serves as an insultating layer protecting our added features from the actual features of the libraries.  I think it should do the following:
  
  * Support arbitrary rank
    * Honestly, it doesn't make much sense to only support up to say rank 4 as by that point generalization to higher ranks   is trivial
@@ -95,56 +96,30 @@ For distributed there is:
    * It dramatically simplifies the interface, is natural, and hides strings of calls to permute etc.
    * One thing to be careful here is that C++ does not allow strings to be non-type template parameters.  This restricts     the amount of compile time optimizations that can occur by deferring them to runtime (reason why Eigen and its tensor   extension do not support Einstein notation at the moment, read about it [here](https://bitbucket.org/eigen/eigen/pull-requests/124/einstein-notation-for-tensor-module/diff)).
    * Limiting them to single letter indices may facilitate future compile time optimizations
- * 
+   * This may need implemented up a level in the user API.
+ * BTAS interface
    * Although it is not clear that any existing tensor library actually follows this, BTAS is really about ensuring
      STL-like interfaces which is important for interacting with standard STL algorithms
-   * At least in my head, BTAS will simplify the problem of writing the user-defined interface by allowing 
+   * At least in my head, BTAS will simplify the problem of writing the user-defined interface by allowing access to the STL algorithms
  * Expression templates
    * It is very difficult to implement Einstein-like noation without these
- * Lazy evaluatoin
+   * We will likely have to implement them as reusing the ones in the implementations will be difficult
+     * Really not that hard if you have familiarity with templates
+   * Again, may belong up a level.
+ * Lazy evaluation
    * The C++-like way to abstract away data access patterns is lazy evaluation.  This allows for reading data from disk,
      reading whole blocks at a time (think shell quartets), or on-the-fly evaluation of elements (think energy denominators)
-   * Technically doesn't require expression templates, but it is again simplified by them
+   * Unfortunately support for this is vague in most libraries so we're probably stuck doing it.
+     * Again, it's basic template semantics and not terribly hard as long as you consider it from the start
+   * I suspect this needs to happen at this level as it would be this API that needs to determine how to act when given
+     an expression for a tensor.
+
+## User API
+ This is what 99% of people will see.  
  * Named subspaces, for example ability to grab the "occupied-occupied" block
- * Expression templates
- * Lazy evaluation (as long as Tiled Array is backend)
- * Wrapper to existing tensor codes: Tiled Array implemented, Cyclops Tensor Framework is a TODO
- * Data locality generally hidden from the developer, although they can specify a preferred storage mechanism.
- * Memory is managed by tensor
- * Paralell filling
- * Compile time error checking
-
-## Interfacial details
-As written the tensor can be used as follows:
-```C++
-Tensor<2> A(10,10);//Declares a 10 by 10 matrix of doubles
-Tensor<2,complex<double> > B(10,10);//Declares a 10 by 10 matrix of complex values
-Tensor<3> C(10,10,10);//Declares a 10 by 10 by 10 rank 3 tensor of doubles
-
-//Fill A with 0
-A.Fill(0.0);
-
-//Fill C in a more complicated fashion
-Tensor<3>::iterator Cijk=C.begin(),CEnd=C.end();
-for(;Cijk!=CEnd;++Cijk){
-  
-  //Returns an index like (1,2,3)
-  const std::array<size_t,3>& Index=Cijk.Index();
-  
-  //Sum the index
-  size_t sum=0;
-  for(size_t i=0;;i<3;++i)sum+=Index[i];
-  
-  //Set the current value to the sum
-  *Cijk=sum;
-}
-
-//Contract A and C along first dimension
-tensor<3> D(10,10,10);
-D["i,j,k]=A["i,l"]*C["l,j,k"];
-
-//Contract A and C along second two dimensions
-tensor<1> E(10);
-E["i"]=A["k,l"]*C["i,k,l"];
-
-```
+ * Either implements or does not impede expression templates
+ * Does not impede lazy evaluation 
+ * Python wrapping happens here
+ 
+## Where do routines go?
+One thing to keep in mind is serialization.  Whether we are sending the tensor over a network or writing it disk it needs to be serialized.  The more you add to a class the harder this is.  The BTAS interface really only defines basic operations like addition, contraction, etc.  In addition to that I propose element-wise operations be added (i.e. divide the whole tensor by a number, add 2 to every element, etc.).  Pretty much every other routine like diagonalization or decompositions should be seperate classes or free functions.  This is because they can go through the public interfaces and don't need to be part of the class.  Furthermore they could then be reused with classes other than the tensor class (assuming the other class meets the interface requirements).
