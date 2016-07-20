@@ -41,8 +41,12 @@ For the moment we are using strings for option keys.  Consequentially we need to
  * `METHOD` : The module key that maps to the EnergyMethod we would like to run (used in methods that farm out other jobs like many-body expansion and counterpoise corrections)
  * `FRAGMENTIZER` : The key for the SystemFragmenter that should be used to generate fragments for methods that need fragments
  * `BASIS_SET` : The key to be given to the System for the basis set
+ * `FITTING_BASIS` : The key for the basis set used for fitting (e.g. RI, JK, f12, etc.)
  * `MAX_DERIV` : Intended more as an internal flag for modules that generate derivatives of a quantity, specifies the maximum analytic derivative the module knows how to do.  Used as an option because it is sometimes nice to be able to force finite difference of modules.
  * `MAX_ITER` : The maximum number of iterations for an iterative method
+ * `DENS_TOLERANCE` : The tolerance for iterative procedures depending on densities
+ * `KEY_INITIAL_GUESS` : The key for the module that makes the initial guess
+ * `DAMPING_FACTOR`:The percentage of the previous Fock matrix to add in
  
 *To Be Continued Later...* 
  
