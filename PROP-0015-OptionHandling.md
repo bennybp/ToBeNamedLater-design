@@ -46,7 +46,8 @@ For the moment we are using strings for option keys.  Consequentially we need to
  * `MAX_ITER` : The maximum number of iterations for an iterative method
  * `DENS_TOLERANCE` : The tolerance for iterative procedures depending on densities
  * `KEY_INITIAL_GUESS` : The key for the module that makes the initial guess
- * `DAMPING_FACTOR`:The percentage of the previous Fock matrix to add in
+ * `DAMPING_FACTOR`:The percentage of the previous Fock matrix (?.  It's density in Psi4) to add in
+ * `FROZEN_CORE` : True if we are freezing the core orbitals for correlated computations
  
 *To Be Continued Later...* 
  
